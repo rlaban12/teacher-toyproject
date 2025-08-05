@@ -42,7 +42,6 @@ public class User {
     @Column(nullable = false)
     private LocalDateTime updatedAt;
 
-
     // AllArgs대신에 따로 생성자를 하나 만듦
     @Builder
     public User(String username, String email, String password) {
