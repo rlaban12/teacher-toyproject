@@ -27,7 +27,12 @@ logging:
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
 
 
-
+# jwt setting
+jwt:
+  # secret key (실제 운영에서는 환경변수로 관리)
+  secret: xgvlyEyY3xOXlr2zKK74vzNx53hSNY6I8Pffbd7AiuY=
+  # 만료시간 (밀리초) - 24시간
+  expiration: 86400000
 
 
 
