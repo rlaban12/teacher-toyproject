@@ -108,6 +108,32 @@ const SignupPage = () => {
     }
   };
 
+  // 사용자명 중복확인 함수
+  const checkDuplicateEmail = async (email) => {
+
+    try {
+      const response = await apiService.get(`/api/auth/check-email?email=${email}`);
+
+      // UI에 피드백 표시
+      if (response.data) { // 중복임
+        updateInputState(
+          state.$emailInput
+          , false
+          , response.message
+        );
+      } else { // 사용가능
+        updateInputState(
+          state.$emailInput
+          , true
+          , response.message
+        );
+      }
+
+    } catch (error) {
+      console.error(error.message);
+    }
+  };
+
 
   // 사용자명 입력 이벤트처리
   const handleUsernameInput = debounce(e => {
@@ -128,6 +154,30 @@ const SignupPage = () => {
     checkDuplicateUsername(username);
 
   }, 500);
+
+
+  // 사용자명 입력 이벤트처리
+  const handleEmailInput = debounce(e => {
+
+    const email = e.target.value;
+
+    // 기본 검증
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      updateInputState(
+        state.$emailInput,
+        false,
+        '올바른 이메일 형식을 입력해주세요.'
+      );
+      return;
+    }
+
+    // 중복 확인
+    checkDuplicateEmail(email);
+
+  }, 500);
+
+
 
   // 폼 제출 이벤트
   const handleSubmit = async (e) => {
@@ -160,7 +210,9 @@ const SignupPage = () => {
     // 1. form 제출 이벤트
     state.$form?.addEventListener('submit', handleSubmit);
     // 2. 사용자명 입력 이벤트
-    state.$usernameInput.addEventListener('input', handleUsernameInput);
+    state.$usernameInput?.addEventListener('input', handleUsernameInput);
+    // 3. 이메일 입력 이벤트
+    state.$emailInput?.addEventListener('input', handleEmailInput);
   };
 
   // 초기화 함수
