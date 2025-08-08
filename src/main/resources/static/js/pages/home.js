@@ -56,9 +56,6 @@ const HomePage = () => {
   const updateUI = () => {
     const { isAuthenticated, user } = authService.checkAuthStatus();
 
-    // header 업데이트
-    authService.updateHeaderUI();
-
     // home 화면 업데이트
     if (isAuthenticated) {
       state.user = user;

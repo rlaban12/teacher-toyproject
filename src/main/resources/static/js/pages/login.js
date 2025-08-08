@@ -27,8 +27,7 @@ const LoginPage = () => {
       localStorage.setItem('token', response.data.token);
       localStorage.setItem('user', JSON.stringify(response.data.user));
 
-      // header의 인증 UI 업데이트
-      authService.updateHeaderUI();
+
 
       utils.showMessage(response.message, 'success');
       utils.redirectTo('/', 1000);

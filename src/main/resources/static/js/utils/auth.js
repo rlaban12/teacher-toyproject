@@ -32,5 +32,13 @@ export const authService = {
       $loginLink.style.display = 'block';
       $usernameSpan.textContent = '사용자';
     }
+  },
+
+  // 로그아웃 처리
+  logout() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    window.location.href = '/';
   }
+
 };
