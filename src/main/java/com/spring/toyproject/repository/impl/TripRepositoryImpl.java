@@ -1,15 +1,18 @@
 package com.spring.toyproject.repository.impl;
 
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.spring.toyproject.domain.entity.QTrip;
 import com.spring.toyproject.domain.entity.QUser;
 import com.spring.toyproject.domain.entity.Trip;
 import com.spring.toyproject.domain.entity.User;
 import com.spring.toyproject.repository.custom.TripRepositoryCustom;
+import com.spring.toyproject.repository.custom.TripSearchCondition;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
@@ -65,8 +68,60 @@ public class TripRepositoryImpl implements TripRepositoryCustom {
         List<Trip> tripList = factory
                 .selectFrom(trip)
                 .where(whereClause)
+                .orderBy(getOrderSpecifier(condition))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
                 .fetch();
 
-        return null;
+        Long totalCount = factory
+                .select(trip.count())
+                .from(trip)
+                .where(whereClause)
+                .fetchOne();
+
+        // 페이징 원본데이터 수 374개인데 이걸 한페이지당 10개씩 뿌려야된다
+        // 그럼 총 페이지수는? 38페이지
+        // 이전, 다음 버튼 활성화 여부
+        return new PageImpl<>(tripList, pageable, totalCount == null ? 0L : totalCount);
+    }
+
+    private OrderSpecifier<?> getOrderSpecifier(TripSearchCondition condition) {
+
+        // 정렬조건
+        String sortBy = condition.getSortBy();
+        // 정렬방향
+        String sortDirection = condition.getSortDirection();
+
+        OrderSpecifier<?> specifier;
+
+        switch (sortBy.toLowerCase()) {
+            case "startdate":
+                specifier = sortDirection.equalsIgnoreCase("DESC")
+                        ? trip.startDate.desc()
+                        : trip.startDate.asc();
+                break;
+            case "enddate":
+                specifier = sortDirection.equalsIgnoreCase("DESC")
+                        ? trip.endDate.desc()
+                        : trip.endDate.asc();
+                break;
+            case "title":
+                specifier = sortDirection.equalsIgnoreCase("DESC")
+                        ? trip.title.desc()
+                        : trip.title.asc();
+                break;
+            case "destination":
+                specifier = sortDirection.equalsIgnoreCase("DESC")
+                        ? trip.destination.desc()
+                        : trip.destination.asc();
+                break;
+            default:
+                specifier = sortDirection.equalsIgnoreCase("DESC")
+                        ? trip.createdAt.desc()
+                        : trip.createdAt.asc();
+                break;
+        }
+
+        return specifier;
     }
 }
