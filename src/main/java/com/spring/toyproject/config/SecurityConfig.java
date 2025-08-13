@@ -39,8 +39,6 @@ public class SecurityConfig {
                 // 기본 인증 비활성화
                 .httpBasic(AbstractHttpConfigurer::disable)
 
-                // 커스텀 필터 설정
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
 
                 // 인가 설정
                 .authorizeHttpRequests(
@@ -62,6 +60,10 @@ public class SecurityConfig {
                                 // 모든 다른 요청은 인증이 필요하다
                                 .anyRequest().authenticated()
                         )
+
+
+                // 커스텀 필터 설정
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 ;
 
         return http.build();
