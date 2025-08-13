@@ -1,5 +1,7 @@
 package com.spring.toyproject.config;
 
+import com.spring.toyproject.jwt.JwtAuthenticationFilter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -7,6 +9,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 /**
  * Spring Security 설정 클래스
@@ -14,7 +17,10 @@ import org.springframework.security.web.SecurityFilterChain;
  */
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
+
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     // 기본 인증 옵션 설정
     @Bean
@@ -33,6 +39,9 @@ public class SecurityConfig {
                 // 기본 인증 비활성화
                 .httpBasic(AbstractHttpConfigurer::disable)
 
+                // 커스텀 필터 설정
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+
                 // 인가 설정
                 .authorizeHttpRequests(
                         auth -> auth
@@ -46,6 +55,7 @@ public class SecurityConfig {
                                 .requestMatchers("/api/auth/**").permitAll()
 
                                 // 인증 및 권한이 필요한 경로
+//                                .requestMatchers("/api/premium/**").hasAnyAuthority("VIP", "GOLD")
                                 .requestMatchers("/api/**").authenticated()
 
                                 // 기타 경로
