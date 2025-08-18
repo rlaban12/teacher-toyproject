@@ -2,16 +2,10 @@ package com.spring.toyproject.service;
 
 import com.spring.toyproject.config.FileUploadConfig;
 import com.spring.toyproject.domain.dto.request.TravelLogRequestDto;
-import com.spring.toyproject.domain.entity.TravelLog;
-import com.spring.toyproject.domain.entity.TravelPhoto;
-import com.spring.toyproject.domain.entity.Trip;
-import com.spring.toyproject.domain.entity.User;
+import com.spring.toyproject.domain.entity.*;
 import com.spring.toyproject.exception.BusinessException;
 import com.spring.toyproject.exception.ErrorCode;
-import com.spring.toyproject.repository.base.TravelLogRepository;
-import com.spring.toyproject.repository.base.TravelPhotoRepository;
-import com.spring.toyproject.repository.base.TripRepository;
-import com.spring.toyproject.repository.base.UserRepository;
+import com.spring.toyproject.repository.base.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -36,6 +30,7 @@ public class TravelLogService {
     private final TripRepository tripRepository;
     private final UserRepository userRepository;
     private final TravelPhotoRepository travelPhotoRepository;
+    private final TagRepository tagRepository;
 
     /**
      * 여행일지 생성
@@ -67,12 +62,19 @@ public class TravelLogService {
                 .trip(trip)
                 .build();
 
-        // 여행 일지 저장
+        // 여행 일지 저장 -> 여행 일지의 ID가 생성됨
         TravelLog savedTravelLog = travelLogRepository.save(travelLog);
+
+        // 해시태그가 있다면 해시태그도 중간테이블에 연계저장
+        List<Long> tagIds = request.getTagIds();
+        if (tagIds != null && !tagIds.isEmpty()) {
+            tagIds.forEach(tagId -> {
+                savedTravelLog.addTag(tagRepository.findById(tagId).orElseThrow());
+            });
+        }
 
         // 이미지가 있다면 이미지도 함께 INSERT
         if (imageFiles != null && !imageFiles.isEmpty()) {
-
 
             // 첨부이미지 파일은 최대 5개만 허용
             for (int i = 0; i < Math.min(imageFiles.size(), 5); i++) {
