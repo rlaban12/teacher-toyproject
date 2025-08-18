@@ -214,6 +214,7 @@ const TravelLogFormPage = () => {
             $.$logDate.value = $.$daySelect.value;
           }
           // 변경 시 날짜 반영
+          // 변경 시 날짜 반영
           $.$daySelect.addEventListener('change', () => {
             $.$logDate.value = $.$daySelect.value || '';
           });
@@ -343,6 +344,7 @@ const TravelLogFormPage = () => {
         $.$tagSuggestions.style.display = 'none';
         return;
       }
+      // 해시태그에 있는 # 을 제거하는 코드
       const keyword = value.slice(1);
       if (!keyword) {
         showSuggestions(cachedCategoryTags);
