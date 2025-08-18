@@ -54,7 +54,8 @@ const TravelLogFormPage = () => {
 
   const onSubmit = async (e) => {
     e.preventDefault();
-    const tripId = parseInt($.$tripId.value);
+    const tripId = parseInt(new URLSearchParams(window.location.search).get('tripId'))
+    console.log('tripId: ', tripId);
     if (!tripId) {
       showAlert('유효하지 않은 접근입니다.');
       return;
@@ -359,6 +360,7 @@ const TravelLogFormPage = () => {
       e.preventDefault();
       const inputVal = ($.$tagInput.value || '').trim();
       if (!inputVal.startsWith('#')) return;
+
       const name = inputVal.slice(1).trim();
       if (!name) return;
       const category = $.$tagCategorySelect.value;
@@ -373,9 +375,11 @@ const TravelLogFormPage = () => {
       );
       if (existing) {
         addTagChip(existing);
-      } else {
+      } else { // 검색결과가 없으면 id 를 null로 해서 자바스크립트 배열에 추가
         addTagChip({ id: null, name, category, color: '#6c757d' });
       }
+      console.log('현재 사용자가 선택한 hashtags: ', state.selectedTags);
+
       $.$tagInput.value = '';
       $.$tagSuggestions.style.display = 'none';
     });
@@ -455,6 +459,8 @@ const TravelLogFormPage = () => {
           .catch(() => null)
       )
     );
+    console.log('서버에 새로 생성된 해시태그: ', created);
+
     created.filter(Boolean).forEach((ct) => {
       const idx = state.selectedTags.findIndex(
         (t) => !t.id && t.name.toLowerCase() === ct.name.toLowerCase()
