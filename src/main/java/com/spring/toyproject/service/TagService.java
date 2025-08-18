@@ -3,6 +3,7 @@ package com.spring.toyproject.service;
 import com.spring.toyproject.domain.dto.request.TagRequestDto;
 import com.spring.toyproject.domain.dto.response.TagResponseDto;
 import com.spring.toyproject.domain.entity.Tag;
+import com.spring.toyproject.domain.entity.TagCategory;
 import com.spring.toyproject.exception.BusinessException;
 import com.spring.toyproject.exception.ErrorCode;
 import com.spring.toyproject.repository.base.TagRepository;
@@ -10,6 +11,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -39,5 +44,15 @@ public class TagService {
         Tag savedTag = tagRepository.save(tag);
         // 클라이언트에게 ID가 포함된 정보를 리턴
         return TagResponseDto.from(savedTag);
+    }
+
+    // 카테고리로 해시태그 목록 가져오기
+    @Transactional(readOnly = true)
+    public List<TagResponseDto> getTagsByCategory(TagCategory category) {
+
+        return tagRepository.findByCategoryOrderByName(category)
+                .stream()
+                .map(TagResponseDto::from)
+                .collect(Collectors.toList());
     }
 }
